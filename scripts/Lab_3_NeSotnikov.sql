@@ -47,8 +47,8 @@ FROM (
 GROUP BY iq.title, iq.season
 ORDER BY iq.title, array_position(array ['winter', 'sprint', 'summer', 'autumn'], iq.season);
 
--- Дополнительный запрос. О
--- бщий анализ прибыли рейсов в формате рейтинга рейсов по прибыльности
+-- Дополнительный запрос.
+-- Общий анализ прибыли рейсов в формате рейтинга рейсов по прибыльности
 SELECT inner_query.voyage_id          as "ID Рейса",
        inner_query.voyage_title       as "Название рейса",
        COUNT(inner_query.flight_cost) as "Количество полётов по рейсу",
