@@ -1,0 +1,17 @@
+economy_class,1,78,1
+economy_class,1,144,2
+business_class,1,8,3
+economy_class,9,164,3
+economy_class,1,174,4
+business_class,1,8,5
+economy_class,9,198,5
+business_class,1,8,6
+economy_class,91,203,6
+business_class,1,8,7
+economy_class,9,176,7
+business_class,1,8,8
+economy_class,9,176,8
+economy_class,1,98,9
+first_class,1,11,10
+business_class,12,52,10
+economy_class,53,262,10

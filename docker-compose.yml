@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  postgres_is:
+    tty: true
+    restart: unless-stopped
+    image: postgres:12
+    container_name: postgres_is
+    volumes:
+      - pg_data_instrumentalnie_sredstva_is:/var/lib/postgresql/data/pg_data_instrumentalnie_sredstva_is
+      - ./data:/home/data
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pg_data_instrumentalnie_sredstva_is
+      - POSTGRES_USER=bdis
+      - POSTGRES_PASSWORD=bdis
+      - POSTGRES_DB=air-port
+    ports:
+      - 5444:5432
+    hostname: localhost
+
+volumes:
+  pg_data_instrumentalnie_sredstva_is:
