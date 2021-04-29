@@ -1,1 +1,1 @@
-CREATE DATABASE airport WITH OWNER bdis;
+CREATE DATABASE "air-port" WITH OWNER bdis;
