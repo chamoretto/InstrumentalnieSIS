@@ -67,7 +67,7 @@ async def setup_connection(
 async def main():
     days_of_simulation = int(input("Введите количество дней симуляции работы аэропорта: \n"))
 
-    connection = await setup_connection("localhost", 5444, "air-port", "bdis", "bdis")
+    connection = await setup_connection("65.21.111.96", 5444, "air-port", "bdis", "bdis")
 
     # фаза подготовки - проверяем базу данных. Должно быть хотя бы 1000 клиентов.
     customers: List[Record]
