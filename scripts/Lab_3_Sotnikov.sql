@@ -1,5 +1,13 @@
 -- noinspection NonAsciiCharactersForFile
 
+                                  -- -- -- --   -- -- -- --
+                                  -- -- -- indexes -- -- --
+
+-- УДАЛИТЬ ИНДЕКСЫ
+
+                                    -- -- -- -- -- -- --
+                                    -- -- -- v1 -- -- --
+
 -- Запрос выводит сведения о заполняемости мест относительно рейсов.
 -- Чем выше коэффициент, тем выше заполняемость рейса.
 SELECT inner_query.voyage_id                     as "ID Рейса",
@@ -15,17 +23,15 @@ FROM (
                 COUNT(ticket.ticket_id) as count_of_bought_tickets
          FROM flight
                   JOIN aircraft a on a.aircraft_id = flight.aircraft_id
-                  JOIN aircraft_type ac_t on a.aircraft_type_id =
-                                             ac_t.aircraft_type_id
-                  JOIN ticket on flight.flight_id = ticket.flight_id
+                  JOIN aircraft_type ac_t on ac_t.aircraft_type_id = a.aircraft_type_id
+                  JOIN ticket on ticket.flight_id = flight.flight_id
                   JOIN voyage v on v.voyage_id = flight.voyage_id
-         GROUP BY v.voyage_id, flight.flight_id, ac_t.manufacturer, ac_t.model,
-                  ac_t.places_number, v.title
+         GROUP BY v.voyage_id, flight.flight_id, ac_t.manufacturer, ac_t.model, ac_t.places_number, v.title
      ) as inner_query
 GROUP BY inner_query.voyage_id, inner_query.voyage_title
 ORDER BY 5 DESC;
 
---Запрос выводит сведения о выкупаемости броней на каждый рейс.
+-- Запрос выводит сведения о выкупаемости броней на каждый рейс.
 -- Чем меньше отменённых броней, тем лучше.
 SELECT cr.voyage_id             as "ID Рейса",
        cr.c                     as "Отменённые брони",
@@ -47,3 +53,10 @@ FROM (
     GROUP BY v.voyage_id
 ) all_r ON cr.voyage_id = all_r.voyage_id;
 
+
+                                  -- -- -- --   -- -- -- --
+                                  -- -- -- indexes -- -- --
+
+-- ТУТ НУЖНО СОЗДАТЬ ИНДЕКСЫ
+                                    -- -- -- -- -- -- --
+                                    -- -- -- v2 -- -- --

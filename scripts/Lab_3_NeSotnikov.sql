@@ -1,3 +1,13 @@
+-- noinspection NonAsciiCharactersForFile
+
+                                  -- -- -- --   -- -- -- --
+                                  -- -- -- indexes -- -- --
+
+-- УДАЛИТЬ ИНДЕКСЫ
+
+                                    -- -- -- -- -- -- --
+                                    -- -- -- v1 -- -- --
+
 -- Запрос выводит данные о том, сколько денег приходится на каждую из моделей самолётов.
 -- Таким образом мы можем судить о выгодности моделей.
 SELECT aircraft_type.aircraft_type_id,
@@ -47,22 +57,27 @@ FROM (
 GROUP BY iq.title, iq.season
 ORDER BY iq.title, array_position(array ['winter', 'sprint', 'summer', 'autumn'], iq.season);
 
--- Дополнительный запрос.
--- Общий анализ прибыли рейсов в формате рейтинга рейсов по прибыльности
+-- Дополнительный запрос. Общий анализ прибыли рейсов в формате рейтинга рейсов по прибыльности
 SELECT inner_query.voyage_id          as "ID Рейса",
        inner_query.voyage_title       as "Название рейса",
        COUNT(inner_query.flight_cost) as "Количество полётов по рейсу",
        SUM(inner_query.flight_cost)   as "Итоговая прибыль по рейсу"
-FROM (SELECT v.voyage_id               as voyage_id,
-             v.title                   as voyage_title,
-             flight.raw_estimated_cost as flight_cost
-      FROM flight
-               JOIN aircraft a on a.aircraft_id = flight.aircraft_id
-               JOIN aircraft_type ac_t on a.aircraft_type_id =
-                                          ac_t.aircraft_type_id
-               JOIN ticket on flight.flight_id = ticket.flight_id
-               JOIN voyage v on v.voyage_id = flight.voyage_id
-      GROUP BY v.voyage_id, flight.flight_id, ac_t.manufacturer, ac_t.model,
-               ac_t.places_number, v.title) as inner_query
+FROM (
+         SELECT v.voyage_id               as voyage_id,
+                v.title                   as voyage_title,
+                flight.raw_estimated_cost as flight_cost
+         FROM flight
+                  JOIN aircraft a on a.aircraft_id = flight.aircraft_id
+                  JOIN aircraft_type ac_t on ac_t.aircraft_type_id = a.aircraft_type_id
+                  JOIN ticket on ticket.flight_id = flight.flight_id
+                  JOIN voyage v on v.voyage_id = flight.voyage_id
+         GROUP BY v.voyage_id, flight.flight_id, ac_t.manufacturer, ac_t.model, ac_t.places_number, v.title
+     ) as inner_query
 GROUP BY inner_query.voyage_id, inner_query.voyage_title
 ORDER BY 4 DESC;
+                                  -- -- -- --   -- -- -- --
+                                  -- -- -- indexes -- -- --
+
+-- ТУТ НУЖНО СОЗДАТЬ ИНДЕКСЫ
+                                    -- -- -- -- -- -- --
+                                    -- -- -- v2 -- -- --
