@@ -17,39 +17,28 @@
 -- > -------------------------------------------------------------------------------- <
 
 -- Темплейтик функции
-CREATE OR REPLACE FUNCTION process_tasks_journals(OUT void) RETURNS void
+
+CREATE OR REPLACE FUNCTION create_ticket_by_paid_reservation(paid_reservation json, place_ int) RETURNS void
     LANGUAGE plpgsql AS
 $$
-DECLARE
-    task tasks;
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-        task = NEW;
-        IF NOT EXISTS(SELECT 1 FROM any_table aee WHERE aee.entity_id = task.id) THEN
-            IF (SELECT id FROM tasks WHERE task_id = NEW.id) IS NULL THEN
-                INSERT INTO tasks (id)
-                values ();
-            END IF;
-        END IF;
-        RETURN task;
-    ELSIF TG_OP = 'UPDATE' THEN
-        task = NEW;
-        NEW.updated_at = current_timestamp;
-        IF OLD.total_work_time = NEW.total_work_time THEN
-            IF OLD.total_cost = NEW.total_cost THEN
-                INSERT INTO tasks (id)
-                values (task.id);
-            END IF;
-        END IF;
-        RETURN task;
-    ELSIF TG_OP = 'DELETE' THEN
-        task = OLD;
-        INSERT INTO tasks (id)
-        values (task.id);
-        DELETE
-        FROM any_table as aee
-        WHERE aee.entity_id = task.id;
-        RETURN task;
-    END IF;
+
+    INSERT INTO ticket (customer_id, flight_id, reservation_id, place, bought_at, is_returned)
+    VALUES ((paid_reservation->>'customer_id')::int,
+            (paid_reservation->>'flight_id')::int,
+            (paid_reservation->>'reservation_id')::int,
+            place_,
+            CURRENT_TIMESTAMP,
+             true);
+
+EXCEPTION
+    -- если ошибка - печатаем в консоль. транзакция откатится автоматически
+    WHEN OTHERS THEN
+        RAISE NOTICE 'ОШИБКА!';
 END;
-$$
+$$;
+
+SELECT create_ticket_by_paid_reservation(
+    (SELECT row_to_json(r.*) FROM reservation r WHERE r.reservation_id = 3 LIMIT 1),
+    22222
+);
