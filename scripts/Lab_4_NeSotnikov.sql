@@ -7,8 +7,8 @@ CREATE OR REPLACE FUNCTION flight_rescheduling(id_flight INT, new_time TIMESTAMP
 $$
 BEGIN
     UPDATE flight SET departure_datetime = new_time WHERE flight.flight_id = id_flight;
-    RETURN(SELECT customer_id FROM customer WHERE customer_id = (SELECT customer_id FROM ticket WHERE flight_id = (SELECT flight_id FROM flight WHERE flight.flight_id = id_flight))
-                                     OR (SELECT customer_id FROM reservation WHERE flight_id = (SELECT flight_id FROM flight WHERE flight.flight_id = id_flight)));
+    RETURN(SELECT customer_id FROM customer WHERE customer_id = (SELECT customer_id FROM ticket WHERE flight_id = id_flight)
+                                     OR (SELECT customer_id FROM reservation WHERE flight_id = id_flight));
 END;
 $$;
 
