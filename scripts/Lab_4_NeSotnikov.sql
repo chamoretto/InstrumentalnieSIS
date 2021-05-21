@@ -1,8 +1,15 @@
 -- > МОДИФИКАЦИЯ ОДНОГО ОБЪЕКТА <
--- ОПИСАНИЕ: Выпуск билета после оплаты брони
--- ОБЛАСТЬ: Информационные системы аэропорта
--- Электронное/физическое воплощение билета после оплаты брони
--- > -------------------------------------------------------------------------------- <
+-- Перенос полёта
+-- Данные о состоянии техники, погоде и других обстоятельствах, способных повлиять на перенос
+-- Уведомление о переносе полёта Предложение компенсации от компании
+CREATE OR REPLACE FUNCTION flight_rescheduling(if_flight INT, new_time TIMESTAMP) RETURNS VOID
+    LANGUAGE plpgsql AS
+$$
+BEGIN
+    UPDATE flight SET departure_datetime = new_time WHERE flight.flight_id = if_flight;
+END;
+$$;
+
 
 -- > КОЛЛЕКЦИЯ <
 -- Ежеквартальная планировка полётов
@@ -15,30 +22,3 @@
 -- Информация о полёте и билетах
 -- Уведомление клиентам об отмене полёта
 -- > -------------------------------------------------------------------------------- <
-
--- Темплейтик функции
-
-CREATE OR REPLACE FUNCTION create_ticket_by_paid_reservation(paid_reservation json, place_ int) RETURNS void
-    LANGUAGE plpgsql AS
-$$
-BEGIN
-
-    INSERT INTO ticket (customer_id, flight_id, reservation_id, place, bought_at, is_returned)
-    VALUES ((paid_reservation->>'customer_id')::int,
-            (paid_reservation->>'flight_id')::int,
-            (paid_reservation->>'reservation_id')::int,
-            place_,
-            CURRENT_TIMESTAMP,
-             true);
-
-EXCEPTION
-    -- если ошибка - печатаем в консоль. транзакция откатится автоматически
-    WHEN OTHERS THEN
-        RAISE NOTICE 'ОШИБКА!';
-END;
-$$;
-
-SELECT create_ticket_by_paid_reservation(
-    (SELECT row_to_json(r.*) FROM reservation r WHERE r.reservation_id = 3 LIMIT 1),
-    22222
-);

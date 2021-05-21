@@ -6,12 +6,44 @@ CREATE OR REPLACE FUNCTION ticket_returning(id_ticket INT) RETURNS VOID
     LANGUAGE plpgsql AS
 $$
 BEGIN
-    UPDATE reservation SET is_cancelled = true WHERE reservation_id = (SELECT reservation_id FROM ticket WHERE ticket_id = id_ticket);
+    UPDATE reservation
+    SET is_cancelled = true
+    WHERE reservation_id = (SELECT reservation_id FROM ticket WHERE ticket_id = id_ticket);
     UPDATE ticket SET is_returned = true WHERE ticket.ticket_id = id_ticket;
 END;
 $$;
 
+-- > МОДИФИКАЦИЯ ОДНОГО ОБЪЕКТА <
+-- ОПИСАНИЕ: Выпуск билета после оплаты брони
+-- ОБЛАСТЬ: Информационные системы аэропорта
+-- Электронное/физическое воплощение билета после оплаты брони
+CREATE OR REPLACE FUNCTION create_ticket_by_paid_reservation(paid_reservation json, place_ int) RETURNS void
+    LANGUAGE plpgsql AS
+$$
+BEGIN
+
+    INSERT INTO ticket (customer_id, flight_id, reservation_id, place, bought_at, is_returned)
+    VALUES ((paid_reservation ->> 'customer_id')::int,
+            (paid_reservation ->> 'flight_id')::int,
+            (paid_reservation ->> 'reservation_id')::int,
+            place_,
+            CURRENT_TIMESTAMP,
+            true);
+
+EXCEPTION
+    -- если ошибка - печатаем в консоль. транзакция откатится автоматически
+    WHEN OTHERS THEN
+        RAISE NOTICE 'ОШИБКА!';
+END;
+$$;
+
+SELECT create_ticket_by_paid_reservation(
+               (SELECT row_to_json(r.*) FROM reservation r WHERE r.reservation_id = 3 LIMIT 1),
+               22222
+           );
+
 ---------------------------------------------------------------------------------------------------------------
+
 
 DROP FUNCTION IF EXISTS reservation_canceling(id_reservation INT);
 CREATE OR REPLACE FUNCTION reservation_canceling(id_reservation INT) RETURNS VOID
@@ -23,19 +55,8 @@ END;
 $$;
 
 
---Перенос полёта
---Данные о состоянии техники, погоде и других обстоятельствах, способных повлиять на перенос
---Уведомление о переносе полёта Предложение компенсации от компании
-CREATE OR REPLACE FUNCTION flight_rescheduling(id_flight INT, new_time TIMESTAMP) RETURNS TEXT
-    LANGUAGE plpgsql AS
-$$
-BEGIN
-    UPDATE flight SET departure_datetime = new_time WHERE flight.flight_id = id_flight;
-    RETURN(SELECT customer_id FROM customer WHERE customer_id = (SELECT customer_id FROM ticket WHERE flight_id = (SELECT flight_id FROM flight WHERE flight.flight_id = id_flight))
-                                     OR (SELECT customer_id FROM reservation WHERE flight_id = (SELECT flight_id FROM flight WHERE flight.flight_id = id_flight)));
-END;
-$$;
-
 --Групповая закупка билетов
 --Клиентские данные
 --Билеты
+
+-- ?????????????
